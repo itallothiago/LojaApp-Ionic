@@ -1,0 +1,83 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home" text="Voltar"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalhes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- @if — carregando -->
+  @if (isLoading) {
+    <div class="loading-box">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p>Carregando produto...</p>
+    </div>
+  }
+
+  <!-- @if — produto carregado -->
+  @if (!isLoading && product) {
+    <div class="detail-wrap">
+
+      <!-- Imagem -->
+      <div class="img-section">
+        <img [src]="product.image" [alt]="product.title" />
+      </div>
+
+      <!-- Informações -->
+      <div class="info-section">
+
+        <ion-badge color="secondary" class="cat-badge">
+          {{ product.category | titlecase }}   <!-- PIPE BUILTIN -->
+        </ion-badge>
+
+        <h1 class="prod-title">{{ product.title }}</h1>
+
+        <div class="rating-row">
+          <!-- PIPE PERSONALIZADA NOVA: stars -->
+          <span class="stars">{{ product.rating.rate | stars }}</span>
+          <span class="rating-text">
+            {{ product.rating.rate }}/5 · {{ product.rating.count }} avaliações
+          </span>
+        </div>
+
+        <!-- Preço -->
+        <div class="price-box">
+          <!-- PIPE BUILTIN: currency -->
+          <span class="price">{{ product.price | currency:'BRL':'symbol':'1.2-2' }}</span>
+          <span class="parcela">
+            ou 3× de {{ (product.price / 3) | currency:'BRL':'symbol':'1.2-2' }}
+          </span>
+        </div>
+
+        <!-- Descrição completa (sem truncate aqui, é a página de detalhe) -->
+        <div class="desc-section">
+          <h3>📦 Descrição</h3>
+          <p>{{ product.description }}</p>
+        </div>
+
+        <small class="product-id">Código: #{{ product.id }}</small>
+
+        <!-- Botões com diretiva appHighlight -->
+        <ion-button
+          expand="block"
+          color="primary"
+          size="large"
+          [appHighlight]="'#ebf8ff'"
+          (click)="addToCart()">
+          <ion-icon name="cart-outline" slot="start"></ion-icon>
+          Adicionar ao Carrinho
+        </ion-button>
+
+        <ion-button expand="block" fill="outline" color="secondary">
+          <ion-icon name="heart-outline" slot="start"></ion-icon>
+          Salvar nos Favoritos
+        </ion-button>
+
+      </div>
+    </div>
+  }
+
+</ion-content>

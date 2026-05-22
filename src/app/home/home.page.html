@@ -1,20 +1,103 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>🛍️ LojaApp</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding-vertical">
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+  <!-- BARRA DE BUSCA + FILTRO -->
+  <div class="search-bar-area">
+    <ion-searchbar
+      placeholder="Buscar produtos..."
+      (ionInput)="searchProducts($event)"
+      animated="true"
+      debounce="300">
+    </ion-searchbar>
+
+    <ion-select
+      placeholder="📂 Filtrar categoria"
+      (ionChange)="filterByCategory($event)"
+      interface="popover"
+      class="category-select">
+      <ion-select-option value="">Todas</ion-select-option>
+
+      <!-- DIRETIVA ESTRUTURAL @for — itera categorias -->
+      @for (cat of categories; track cat) {
+        <ion-select-option [value]="cat">
+          {{ cat | titlecase }}   <!-- PIPE BUILTIN: titlecase -->
+        </ion-select-option>
+      }
+    </ion-select>
   </div>
+
+  <!-- DIRETIVA ESTRUTURAL @if — mostra spinner enquanto carrega -->
+  @if (isLoading) {
+    <div class="loading-box">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p>Carregando produtos...</p>
+    </div>
+  }
+
+  <!-- DIRETIVA ESTRUTURAL @if — exibe grid quando carregado -->
+  @if (!isLoading) {
+    <ion-grid>
+      <ion-row>
+
+        <!-- DIRETIVA ESTRUTURAL @for — itera produtos -->
+        @for (product of filteredProducts; track product.id) {
+          <ion-col size="12" size-sm="6" size-lg="4">
+
+            <!-- DIRETIVA PERSONALIZADA appHighlight -->
+            <ion-card
+              [appHighlight]="'#eef6ff'"
+              (click)="goToDetail(product.id)"
+              class="product-card">
+
+              <div class="img-wrap">
+                <img [src]="product.image" [alt]="product.title" />
+                <ion-badge color="secondary" class="cat-badge">
+                  {{ product.category | titlecase }}
+                </ion-badge>
+              </div>
+
+              <ion-card-header>
+                <ion-card-title class="prod-title">
+                  <!-- PIPE PERSONALIZADA: truncate -->
+                  {{ product.title | truncate:55 }}
+                </ion-card-title>
+              </ion-card-header>
+
+              <ion-card-content>
+                <p class="prod-desc">
+                  <!-- PIPE PERSONALIZADA: truncate (reutilizada) -->
+                  {{ product.description | truncate:85 }}
+                </p>
+
+                <div class="prod-footer">
+                  <!-- PIPE BUILTIN: currency -->
+                  <span class="price">{{ product.price | currency:'BRL':'symbol':'1.2-2' }}</span>
+
+                  <!-- PIPE PERSONALIZADA NOVA: stars -->
+                  <span class="stars">{{ product.rating.rate | stars }}</span>
+                </div>
+
+                <ion-button
+                  expand="block"
+                  fill="solid"
+                  color="primary"
+                  class="btn-ver"
+                  (click)="goToDetail(product.id); $event.stopPropagation()">
+                  Ver Detalhes →
+                </ion-button>
+              </ion-card-content>
+            </ion-card>
+
+          </ion-col>
+        }
+
+      </ion-row>
+    </ion-grid>
+  }
+
 </ion-content>
